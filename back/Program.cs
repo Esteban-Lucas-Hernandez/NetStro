@@ -1,4 +1,11 @@
+using Microsoft.EntityFrameworkCore;
+using back.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Configurar DbContext con SQLite
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Configurar controladores
 builder.Services.AddControllers();
@@ -15,6 +22,13 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// Asegurar que la base de datos sea creada automáticamente al iniciar
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.EnsureCreated();
+}
 
 // Usar el middleware de CORS
 app.UseCors("AllowAstro");
