@@ -1,130 +1,34 @@
-﻿---
+---
 /**
- * Layout.astro — Plantilla base de la aplicacion
- * ------------------------------------------------
- * Todas las paginas de NetStro extienden este layout.
- * Responsabilidades:
- *   1. Definir el DOCTYPE, <head> y <body> del documento HTML.
- *   2. Establecer las variables CSS globales (design tokens) del tema.
- *   3. Aplicar estilos de reset y estilos base compartidos por toda la app.
- *   4. Renderizar el contenido de la pagina hija a traves de <slot />.
- *
- * Props:
- *   title (opcional) — Texto que aparece en la pestaña del navegador.
- *                      Por defecto: "NetStro - Gestion de Tareas".
+ * Layout.astro — Plantilla Base de la Aplicación
  */
+import '../styles/global.css';
+
 export interface Props {
   title?: string;
 }
 
-// Desestructuramos la prop 'title' con valor por defecto
-const { title = 'NetStro - Gestión de Tareas' } = Astro.props;
+const { title = 'NetStro — Gestión Profesional de Tareas' } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="es">
   <head>
-    <!-- Codificacion de caracteres: soporta tildes y caracteres especiales -->
     <meta charset="utf-8" />
-
-    <!-- Viewport responsivo: escala correctamente en moviles -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <!-- Favicon en formato SVG (navegadores modernos) y fallback .ico -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" />
-
-    <!-- Astro inyecta aqui la version del generador (util para debugging) -->
     <meta name="generator" content={Astro.generator} />
 
-    <!-- Titulo dinamico recibido como prop -->
+    <!-- Google Fonts: Plus Jakarta Sans + Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <title>{title}</title>
-
-    <style>
-      /* ── RESET GLOBAL ─────────────────────────────────────────
-         Elimina margenes y paddings por defecto en todos los
-         elementos, y unifica el modelo de caja a border-box
-         (el padding y el border se incluyen dentro del ancho). */
-      *, *::before, *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-
-      /* ── DESIGN TOKENS (Variables CSS) ───────────────────────
-         Centralizamos todos los colores, radios y transiciones
-         aqui como variables CSS. Si el diseno cambia, basta con
-         modificar este bloque sin tocar los componentes. */
-      :root {
-        /* Fondos: de mas oscuro (fondo de pagina) a mas claro (superficie) */
-        --color-bg:        #0f1117; /* Fondo general de la pagina */
-        --color-surface:   #1a1d27; /* Superficies: cards, header */
-        --color-surface-2: #22263a; /* Superficies secundarias: inputs, cards internas */
-        --color-border:    #2e3347; /* Color de bordes y separadores */
-
-        /* Colores de accion */
-        --color-primary:       #6366f1; /* Indigo — botones principales, acentos */
-        --color-primary-hover: #818cf8; /* Indigo mas claro al hacer hover */
-        --color-success:       #22c55e; /* Verde — mensajes de exito, completada */
-        --color-danger:        #ef4444; /* Rojo — errores, eliminacion */
-        --color-warning:       #f59e0b; /* Amarillo — estado pendiente */
-
-        /* Tipografia */
-        --color-text:       #e2e8f0; /* Texto principal (casi blanco) */
-        --color-text-muted: #94a3b8; /* Texto secundario (gris azulado) */
-
-        /* Miscelaneos */
-        --radius:     10px;                    /* Radio de borde estandar para cards */
-        --shadow:     0 4px 24px rgba(0,0,0,0.4); /* Sombra estandar para cards */
-        --transition: 0.18s ease;              /* Duracion estandar de transiciones */
-
-        /* Fuente del sistema; Inter primero si esta disponible */
-        font-family: Inter, 'Segoe UI', system-ui, sans-serif;
-      }
-
-      /* ── BASE DE PAGINA ───────────────────────────────────────
-         html y body ocupan al menos toda la altura de la ventana,
-         con el fondo oscuro y el color de texto global. */
-      html, body {
-        min-height: 100%;
-        background: var(--color-bg);
-        color: var(--color-text);
-      }
-
-      body {
-        line-height: 1.6; /* Interlineado comodo para lectura */
-      }
-
-      /* ── FORMULARIOS ──────────────────────────────────────────
-         Heredan la fuente del body por defecto (los navegadores
-         NO la heredan automaticamente en inputs y botones). */
-      input, textarea, select, button {
-        font-family: inherit;
-        font-size: 0.95rem;
-      }
-
-      /* Todos los botones muestran cursor de puntero */
-      button { cursor: pointer; }
-
-      /* ── ENLACES ──────────────────────────────────────────────
-         Color primario sin subrayado; cambia al hacer hover. */
-      a { color: var(--color-primary); text-decoration: none; }
-      a:hover { color: var(--color-primary-hover); }
-
-      /* ── SCROLLBAR PERSONALIZADA (solo WebKit: Chrome, Edge) ──
-         Hacemos la barra de scroll mas delgada y acorde al tema. */
-      ::-webkit-scrollbar       { width: 6px; }
-      ::-webkit-scrollbar-track { background: var(--color-surface); }
-      ::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
-    </style>
   </head>
 
   <body>
-    <!--
-      <slot /> es el punto de insercion de Astro:
-      el contenido de la pagina hija se renderiza aqui.
-      Equivale a {children} en React.
-    -->
     <slot />
   </body>
 </html>

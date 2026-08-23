@@ -1,0 +1,35 @@
+---
+/**
+ * Controls.astro — Barra de Búsqueda y Pestañas de Filtro
+ */
+---
+
+<section class="controls-bar">
+  <!-- Buscador -->
+  <div class="search-box">
+    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+    <input 
+      type="text" 
+      id="search-input" 
+      placeholder="Buscar por título o descripción..." 
+      autocomplete="off"
+    />
+    <button id="btn-clear-search" class="btn-clear hidden" title="Limpiar búsqueda">×</button>
+  </div>
+
+  <!-- Tabs de Filtro -->
+  <div class="filter-tabs">
+    <button class="tab-btn active" data-filter="all">
+      Todas <span class="tab-count" id="count-tab-all">0</span>
+    </button>
+    <button class="tab-btn" data-filter="pending">
+      Pendientes <span class="tab-count" id="count-tab-pending">0</span>
+    </button>
+    <button class="tab-btn" data-filter="completed">
+      Completadas <span class="tab-count" id="count-tab-completed">0</span>
+    </button>
+  </div>
+</section>

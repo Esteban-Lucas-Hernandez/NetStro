@@ -1,4 +1,4 @@
-﻿// =============================================================
+// =============================================================
 // src/services/api.ts
 // -------------------------------------------------------------
 // Capa de servicio: centraliza TODAS las peticiones HTTP hacia
@@ -198,19 +198,25 @@ export async function deleteTask(id: number): Promise<ApiResult<void>> {
   }
 }
 
-// -------------------------------------------------------------
-// ⚠️  FUNCIONALIDAD PENDIENTE: Listar todas las tareas
-// -------------------------------------------------------------
-// El endpoint GET /api/tasks NO existe actualmente en el backend.
-// Cuando se implemente, agregar aquí:
-//
-// export async function getAllTasks(): Promise<ApiResult<TaskItem[]>> {
-//   try {
-//     const res = await fetch(`${BASE_URL}/api/tasks`);
-//     if (!res.ok) { ... }
-//     const data: TaskItem[] = await res.json();
-//     return { data };
-//   } catch {
-//     return { error: 'No se pudo conectar con el servidor.' };
-//   }
-// }
+/**
+ * Obtiene todas las tareas registradas en el backend.
+ *
+ * Endpoint: GET /api/tasks
+ * No se envía body.
+ * Respuesta esperada: Arreglo de objetos TaskItem.
+ */
+export async function getAllTasks(): Promise<ApiResult<TaskItem[]>> {
+  try {
+    const res = await fetch(`${BASE_URL}/api/tasks`);
+
+    if (!res.ok) {
+      const msg = await res.text();
+      return { error: `Error ${res.status}: ${msg || res.statusText}` };
+    }
+
+    const data: TaskItem[] = await res.json();
+    return { data };
+  } catch {
+    return { error: 'No se pudo conectar con el servidor.' };
+  }
+}

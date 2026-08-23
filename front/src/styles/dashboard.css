@@ -1,0 +1,618 @@
+/* =============================================================
+   src/styles/dashboard.css
+   Estilos del Dashboard: Header, Métricas, Buscador, Tareas y Footer
+   ============================================================= */
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ────────────────────────────────────────────────── */
+.app-header {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.875rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-icon-wrapper {
+  width: 38px;
+  height: 38px;
+  background: var(--color-accent-light);
+  border: 1px solid var(--color-accent-border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-icon {
+  font-size: 1.25rem;
+}
+
+.brand-text {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brand-name {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.brand-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--color-accent-light);
+  color: var(--color-primary);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-accent-border);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.api-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+}
+
+.badge-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--color-accent);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+.btn-new-task {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--color-primary);
+  color: white;
+  font-weight: 600;
+  padding: 0.6rem 1.25rem;
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-green);
+  transition: var(--transition);
+}
+
+.btn-new-task:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+}
+
+/* ── MAIN ──────────────────────────────────────────────────── */
+.app-main {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Toast Notification */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 2000;
+  padding: 0.85rem 1.4rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-lg);
+  animation: toastIn 0.3s ease;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.toast.success {
+  background: var(--color-primary);
+  color: white;
+}
+
+.toast.error {
+  background: var(--color-danger);
+  color: white;
+}
+
+/* ── 1. MÉTRICAS ────────────────────────────────────────────── */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+.metric-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.metric-card:hover {
+  box-shadow: var(--shadow);
+  border-color: var(--color-border-hover);
+}
+
+.metric-icon-bg {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.metric-icon-bg.green { background: #e0f2fe; color: #0284c7; }
+.metric-icon-bg.amber { background: #fef3c7; color: #d97706; }
+.metric-icon-bg.emerald { background: var(--color-accent-light); color: var(--color-primary); }
+
+.metric-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.metric-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.progress-card {
+  grid-column: span 1;
+}
+
+.metric-info-full {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.progress-percent {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.progress-bar-track {
+  width: 100%;
+  height: 8px;
+  background: var(--color-surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-primary));
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+/* ── 2. CONTROLES Y FILTROS ────────────────────────────────── */
+.controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  position: relative;
+  flex: 1;
+  min-width: 280px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+}
+
+.search-box input {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 2.75rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  box-shadow: var(--shadow-sm);
+  outline: none;
+  transition: var(--transition);
+}
+
+.search-box input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+}
+
+.btn-clear {
+  position: absolute;
+  right: 0.8rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--color-text-muted);
+}
+
+.filter-tabs {
+  display: flex;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: 0.3rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  gap: 0.25rem;
+}
+
+.tab-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tab-btn:hover {
+  color: var(--color-text);
+}
+
+.tab-btn.active {
+  background: var(--color-accent-light);
+  color: var(--color-primary);
+}
+
+.tab-count {
+  background: var(--color-surface-2);
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+}
+
+.tab-btn.active .tab-count {
+  background: var(--color-accent-border);
+  color: var(--color-primary-hover);
+}
+
+/* ── 3. LISTADO DE TAREAS (GRID) ────────────────────────────── */
+.tasks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.25rem;
+}
+
+.task-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  position: relative;
+}
+
+.task-card:hover {
+  box-shadow: var(--shadow);
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+}
+
+.task-card.completed {
+  background: #fafafa;
+  border-color: #e2e8f0;
+}
+
+.task-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-checkbox-label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.card-checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.checkbox-box-custom {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #cbd5e1;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background: white;
+  transition: var(--transition);
+}
+
+.card-checkbox:checked + .checkbox-box-custom {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.task-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.id-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  background: var(--color-surface-2);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+}
+
+.status-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+}
+
+.status-badge.status-done {
+  background: var(--color-accent-light);
+  color: var(--color-primary);
+}
+
+.status-badge.status-wait {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.task-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.task-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+.task-card.completed .task-title {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+}
+
+.task-desc {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.task-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.task-date {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.task-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.btn-icon.btn-edit:hover {
+  background: var(--color-accent-light);
+  color: var(--color-primary);
+  border-color: var(--color-accent-border);
+}
+
+.btn-icon.btn-delete:hover {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border-color: #fecaca;
+}
+
+/* Empty State */
+.empty-state {
+  background: var(--color-surface);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 4rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.empty-icon {
+  font-size: 3rem;
+}
+
+.empty-state h3 {
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.empty-state p {
+  color: var(--color-text-muted);
+  max-width: 400px;
+  font-size: 0.95rem;
+}
+
+.btn-primary-sm {
+  margin-top: 0.5rem;
+  background: var(--color-primary);
+  color: white;
+  font-weight: 600;
+  padding: 0.6rem 1.25rem;
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-green);
+}
+
+/* Skeleton Loading */
+.skeleton-card {
+  height: 180px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: skeletonLoading 1.5s infinite;
+  border-radius: var(--radius);
+}
+
+@keyframes skeletonLoading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── FOOTER ────────────────────────────────────────────────── */
+.app-footer {
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  padding: 1.25rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  .controls-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .tasks-grid {
+    grid-template-columns: 1fr;
+  }
+}

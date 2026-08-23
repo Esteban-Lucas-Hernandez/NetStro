@@ -1,0 +1,36 @@
+---
+/**
+ * Header.astro — Barra de Navegación Superior Fija
+ */
+---
+
+<header class="app-header">
+  <div class="header-inner">
+    <!-- Logotipo -->
+    <div class="header-brand">
+      <div class="brand-icon-wrapper">
+        <span class="brand-icon">⚡</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">NetStro</span>
+        <span class="brand-badge">Task Manager</span>
+      </div>
+    </div>
+
+    <!-- Acciones Derecha -->
+    <div class="header-actions">
+      <div class="api-badge" id="api-status-badge">
+        <span class="badge-dot"></span>
+        <span id="api-status-text">API: localhost:5000</span>
+      </div>
+
+      <button id="btn-open-create-modal" class="btn-new-task">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>Nueva Tarea</span>
+      </button>
+    </div>
+  </div>
+</header>
