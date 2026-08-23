@@ -3,9 +3,9 @@ using back.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configurar DbContext con SQLite
+// Configurar SQLite DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=tasks.db"));
 
 // Configurar controladores
 builder.Services.AddControllers();
@@ -23,7 +23,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Asegurar que la base de datos sea creada automáticamente al iniciar
+// Crear base de datos automáticamente si no existe
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
