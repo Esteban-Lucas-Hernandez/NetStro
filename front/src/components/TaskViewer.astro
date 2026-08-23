@@ -1,0 +1,362 @@
+---
+/**
+ * TaskViewer.astro — Panel de Busqueda y Detalle de Tarea
+ * --------------------------------------------------------
+ * Componente puramente de presentacion (HTML + CSS).
+ * Su logica JavaScript es gestionada desde index.astro.
+ *
+ * Responsabilidades:
+ *   1. Mostrar un campo de busqueda por ID + boton "Buscar".
+ *   2. Al recibir una tarea del script, mostrar su detalle:
+ *      - Badge de estado (Completada / Pendiente)
+ *      - ID y fecha de creacion
+ *      - Titulo y descripcion
+ *      - Botones de accion: Editar, Toggle completada, Eliminar
+ *   3. Mostrar alertas de exito/error en la busqueda y en las acciones.
+ *
+ * IDs expuestos que usa index.astro:
+ *   #search-id            — Input numerico para ingresar el ID
+ *   #btn-search           — Boton de busqueda (tiene .btn-text y .spinner)
+ *   #search-alert         — Alerta de resultado de busqueda
+ *   #task-detail          — Contenedor del detalle (oculto hasta encontrar tarea)
+ *   #detail-status-badge  — Badge con el estado de la tarea
+ *   #detail-id            — Span que muestra el id
+ *   #detail-created       — Span que muestra la fecha formateada
+ *   #detail-title         — h3 con el titulo
+ *   #detail-description   — p con la descripcion
+ *   #btn-edit-task        — Boton para cargar la tarea en el formulario
+ *   #btn-toggle-complete  — Boton para alternar isCompleted
+ *   #btn-delete-task      — Boton para eliminar (tiene .btn-text y .spinner)
+ *   #action-alert         — Alerta de resultado de edicion/eliminacion
+ */
+---
+
+<!-- Tarjeta contenedora del buscador -->
+<section class="card" id="task-viewer-section">
+
+  <h2>Buscar Tarea por ID</h2>
+
+  <!-- ── FILA DE BUSQUEDA ───────────────────────────────────────
+       Input numerico + boton en la misma fila.
+       El script escucha el click del boton y la tecla Enter en el input. -->
+  <div class="search-row">
+    <!-- min="1" para aceptar solo IDs positivos -->
+    <input
+      type="number"
+      id="search-id"
+      placeholder="Ingresa el ID de la tarea"
+      min="1"
+      autocomplete="off"
+    />
+    <!--
+      Boton de busqueda con spinner interno.
+      JS alterna .hidden en .spinner y deshabilita el boton durante el fetch.
+    -->
+    <button class="btn btn--primary" id="btn-search">
+      <span class="btn-text">Buscar</span>
+      <span class="spinner hidden"></span>
+    </button>
+  </div>
+
+  <!-- Alerta de busqueda: muestra "no encontrada", errores de red, etc. -->
+  <div id="search-alert" class="alert hidden" role="alert"></div>
+
+  <!-- ── DETALLE DE LA TAREA ────────────────────────────────────
+       Oculto por defecto (clase 'hidden').
+       JS llama a renderTask() para llenarlo con datos y hacerlo visible. -->
+  <div id="task-detail" class="hidden">
+    <div class="task-card">
+
+      <!-- Cabecera: badge de estado + metadatos (ID y fecha) -->
+      <div class="task-header">
+
+        <!--
+          Badge dinamico de estado.
+          JS le pone el texto ("✓ Completada" / "⏳ Pendiente")
+          y la clase CSS ("completed" / "pending") segun isCompleted.
+        -->
+        <div class="task-status" id="detail-status-badge"></div>
+
+        <!-- Metadatos de la tarea: ID y fecha de creacion formateada -->
+        <div class="task-meta">
+          <span class="meta-label">ID:</span>
+          <span id="detail-id" class="meta-value"></span>  <!-- JS inyecta el numero -->
+          <span class="meta-sep">·</span>
+          <span class="meta-label">Creada:</span>
+          <span id="detail-created" class="meta-value"></span> <!-- JS inyecta la fecha -->
+        </div>
+      </div>
+
+      <!-- Titulo de la tarea (JS inyecta el texto) -->
+      <h3 id="detail-title" class="task-title"></h3>
+
+      <!-- Descripcion de la tarea (JS inyecta el texto o "(Sin descripcion)") -->
+      <p id="detail-description" class="task-desc"></p>
+
+      <!-- ── BOTONES DE ACCION ────────────────────────────────── -->
+      <div class="task-actions">
+
+        <!--
+          Boton EDITAR: carga la tarea actual en TaskForm.
+          JS escucha el click, rellena los campos del formulario
+          y hace scroll hasta el formulario.
+        -->
+        <button class="btn btn--primary" id="btn-edit-task">
+          ✏️ Editar
+        </button>
+
+        <!--
+          Boton TOGGLE: alterna isCompleted entre true/false.
+          JS cambia su texto dinamicamente:
+            - "✔ Marcar completada" si la tarea esta pendiente
+            - "↩ Marcar pendiente"  si la tarea esta completada
+          Internamente hace PUT /api/tasks/{id} con isCompleted invertido.
+        -->
+        <button class="btn btn--complete" id="btn-toggle-complete">
+          <!-- El texto lo pone JS segun el estado actual de la tarea -->
+        </button>
+
+        <!--
+          Boton ELIMINAR: pide confirmacion y hace DELETE /api/tasks/{id}.
+          Incluye spinner para mostrar el estado de carga.
+        -->
+        <button class="btn btn--danger" id="btn-delete-task">
+          <span class="btn-text">🗑 Eliminar</span>
+          <span class="spinner hidden"></span>
+        </button>
+
+      </div>
+
+      <!-- Alerta de acciones: errores o exitos al editar/eliminar -->
+      <div id="action-alert" class="alert hidden" role="alert"></div>
+
+    </div>
+  </div>
+
+</section>
+
+<style>
+  /* ── TARJETA CONTENEDORA ────────────────────────────────────── */
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+  }
+
+  /* Titulo con barra indigo decorativa (mismo patron que TaskForm) */
+  h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  h2::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 1.1em;
+    background: var(--color-primary);
+    border-radius: 2px;
+  }
+
+  /* ── FILA DE BUSQUEDA ───────────────────────────────────────── */
+  .search-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap; /* en movil el boton baja a la siguiente linea */
+  }
+
+  /* Input numerico del ID */
+  #search-id {
+    flex: 1;           /* ocupa el espacio disponible */
+    min-width: 140px;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: calc(var(--radius) - 2px);
+    color: var(--color-text);
+    padding: 0.625rem 0.875rem;
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
+
+  #search-id:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
+  }
+
+  #search-id::placeholder { color: var(--color-text-muted); opacity: 0.6; }
+
+  /* Ocultar flechas del input type="number" en navegadores WebKit y Firefox */
+  #search-id::-webkit-inner-spin-button,
+  #search-id::-webkit-outer-spin-button { -webkit-appearance: none; }
+  #search-id { -moz-appearance: textfield; }
+
+  /* ── TARJETA DE DETALLE DE LA TAREA ────────────────────────── */
+  .task-card {
+    background: var(--color-surface-2); /* un tono mas claro que la card externa */
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-top: 1rem;
+    animation: fadeIn 0.25s ease; /* aparece con una suave animacion al renderizar */
+  }
+
+  /* Animacion de aparicion: sube 6px y aparece de opacidad 0 a 1 */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* Cabecera del detalle: badge y metadatos en fila */
+  .task-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  /* ── BADGE DE ESTADO ────────────────────────────────────────── */
+  .task-status {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px; /* totalmente redondeado = pill */
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  /* Variante: tarea completada → verde */
+  .task-status.completed {
+    background: rgba(34,197,94,0.15);
+    color: var(--color-success);
+    border: 1px solid rgba(34,197,94,0.3);
+  }
+
+  /* Variante: tarea pendiente → amarillo */
+  .task-status.pending {
+    background: rgba(245,158,11,0.15);
+    color: var(--color-warning);
+    border: 1px solid rgba(245,158,11,0.3);
+  }
+
+  /* ── METADATOS (ID y fecha) ─────────────────────────────────── */
+  .task-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    flex-wrap: wrap;
+  }
+
+  .meta-label { font-weight: 500; }           /* "ID:" y "Creada:" */
+  .meta-value { color: var(--color-text); }    /* valor del dato */
+  .meta-sep   { opacity: 0.4; }               /* separador "·" atenuado */
+
+  /* ── TITULO Y DESCRIPCION DE LA TAREA ───────────────────────── */
+  .task-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+  }
+
+  .task-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    white-space: pre-wrap;  /* respeta saltos de linea del usuario */
+    word-break: break-word; /* evita desbordamiento en textos sin espacios */
+  }
+
+  /* ── FILA DE BOTONES DE ACCION ──────────────────────────────── */
+  .task-actions {
+    display: flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+  }
+
+  /* ── ESTILOS BASE DE BOTON ──────────────────────────────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1.1rem;
+    border-radius: calc(var(--radius) - 2px);
+    font-weight: 500;
+    border: none;
+    font-size: 0.875rem;
+    transition: background var(--transition), transform var(--transition), opacity var(--transition);
+  }
+
+  .btn:active { transform: scale(0.97); }
+
+  /* Boton Editar: fondo indigo */
+  .btn--primary { background: var(--color-primary); color: white; }
+  .btn--primary:hover { background: var(--color-primary-hover); }
+
+  /* Boton Toggle completada: estilo verde translucido */
+  .btn--complete {
+    background: rgba(34,197,94,0.15);
+    color: var(--color-success);
+    border: 1px solid rgba(34,197,94,0.3);
+  }
+  .btn--complete:hover { background: rgba(34,197,94,0.25); }
+
+  /* Boton Eliminar: estilo rojo translucido */
+  .btn--danger {
+    background: rgba(239,68,68,0.15);
+    color: var(--color-danger);
+    border: 1px solid rgba(239,68,68,0.3);
+  }
+  .btn--danger:hover { background: rgba(239,68,68,0.25); }
+
+  /* Boton deshabilitado durante operaciones asincronas */
+  .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  /* ── ALERTAS DE RESULTADO ───────────────────────────────────── */
+  .alert {
+    padding: 0.7rem 1rem;
+    border-radius: calc(var(--radius) - 2px);
+    font-size: 0.875rem;
+    margin-top: 0.75rem;
+    border-left: 3px solid;
+  }
+  .alert.success {
+    background: rgba(34,197,94,0.1);
+    border-color: var(--color-success);
+    color: var(--color-success);
+  }
+  .alert.error {
+    background: rgba(239,68,68,0.1);
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+  }
+
+  /* Clase utilitaria para ocultar elementos */
+  .hidden { display: none !important; }
+
+  /* ── SPINNER DE CARGA ───────────────────────────────────────── */
+  .spinner {
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: currentColor; /* hereda el color del boton padre */
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
