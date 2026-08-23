@@ -1,0 +1,49 @@
+---
+/**
+ * Metrics.astro — Tarjetas de Estadísticas y Barra de Progreso
+ */
+---
+
+<section class="metrics-grid">
+  <div class="metric-card">
+    <div class="metric-icon-bg green">
+      <span>📋</span>
+    </div>
+    <div class="metric-info">
+      <span class="metric-label">Total de Tareas</span>
+      <span class="metric-value" id="stat-total">0</span>
+    </div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-icon-bg amber">
+      <span>⏳</span>
+    </div>
+    <div class="metric-info">
+      <span class="metric-label">Pendientes</span>
+      <span class="metric-value" id="stat-pending">0</span>
+    </div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-icon-bg emerald">
+      <span>✅</span>
+    </div>
+    <div class="metric-info">
+      <span class="metric-label">Completadas</span>
+      <span class="metric-value" id="stat-completed">0</span>
+    </div>
+  </div>
+
+  <div class="metric-card progress-card">
+    <div class="metric-info-full">
+      <div class="progress-header">
+        <span class="metric-label">Progreso General</span>
+        <span class="progress-percent" id="stat-percent">0%</span>
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="stat-progress-bar" style="width: 0%"></div>
+      </div>
+    </div>
+  </div>
+</section>

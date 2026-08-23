@@ -1,0 +1,65 @@
+---
+/**
+ * TaskModal.astro — Modal Flotante para Crear y Editar Tareas
+ */
+import '../styles/modal.css';
+---
+
+<div id="task-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-card">
+    
+    <!-- Header del Modal -->
+    <div class="modal-header">
+      <div class="modal-header-title">
+        <span class="modal-icon">✍️</span>
+        <h2 id="modal-title">Nueva Tarea</h2>
+      </div>
+      <button type="button" id="btn-modal-close" class="btn-close" aria-label="Cerrar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Formulario del Modal -->
+    <form id="modal-form" class="modal-body">
+      <!-- ID oculto para modo edicion -->
+      <input type="hidden" id="modal-task-id" value="" />
+
+      <!-- Caja de Alertas dentro del Modal -->
+      <div id="modal-alert" class="alert hidden"></div>
+
+      <!-- Campo Título -->
+      <div class="form-group">
+        <label for="modal-task-title">Título de la Tarea <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="modal-task-title" 
+          placeholder="Ej. Revisar entregables del sprint" 
+          required 
+          autocomplete="off"
+        />
+      </div>
+
+      <!-- Campo Descripción -->
+      <div class="form-group">
+        <label for="modal-task-desc">Descripción (opcional)</label>
+        <textarea 
+          id="modal-task-desc" 
+          rows="3" 
+          placeholder="Añade detalles o notas adicionales..."
+        ></textarea>
+      </div>
+
+      <!-- Footer del Modal con Acciones -->
+      <div class="modal-footer">
+        <button type="button" id="btn-modal-cancel" class="btn-secondary">Cancelar</button>
+        <button type="submit" id="btn-modal-submit" class="btn-primary">
+          <span class="btn-text">Guardar Tarea</span>
+          <span class="spinner hidden"></span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
