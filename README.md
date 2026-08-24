@@ -101,7 +101,7 @@ Sigue estos sencillos pasos para poner en marcha el proyecto en tu máquina loca
 
 ### 1. Clonar el repositorio
 ```bash
-git clone https://github.com/tu-usuario/NetStro.git
+git clone https://github.com/Esteban-Lucas-Hernandez/NetStro.git
 cd NetStro
 ```
 
